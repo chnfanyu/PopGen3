@@ -10,4 +10,9 @@
 - Fully compatible with Python 3, with updated dependencies.
 
 
-**Key Contents**
+**Key Contents:**
+
+Data inputs: 
+- survey sample data: 
+-- 'household_sample.csv'
+-- 'person_sample.csv'
