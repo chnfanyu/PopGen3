@@ -3,7 +3,11 @@
 ## Introduction
 **PopGen** is a state-of-the-art open-source synthetic population generator for advanced travel demand modeling. Developed under the guidance of Professor Ram M. Pendyala at Arizona State University, PopGen utilizes a heuristic algorithm IPU to control and match both household-level and person-level attribute distributions
 
-**Key Features of PopGen 3:**
+**Key Updates of PopGen 3:**
 
-- Enhanced capability to control variables of interest at multiple geographic resolutions simultaneously.
-- Operates through a command-line interface, simplifying usage and improving computational efficiency.
+- Advanced control of household and person variables across multiple geographic resolutions (region and geo).
+- Command-line interface for simplified usage and enhanced computational efficiency.
+- Built for Python 3.
+
+
+**Key Contents**
