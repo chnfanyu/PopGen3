@@ -15,19 +15,31 @@
 ### Data Inputs
 
 #### Survey sample data:
-   `household_sample.csv`: household-level data  
-   `person_sample.csv`: individual-level data  
+  `household_sample.csv`: household-level data  
+  `person_sample.csv`: individual-level data
 
-#### Marginal data:
+#### Population marginal data:
 
 - **geo-level marginals:**  
-  `person_marginals.csv`  
-  `household_marginals.csv`  
+     `person_marginals.csv`  
+     `household_marginals.csv`  
 
 - **region-level marginals:**  
   `region_person_marginals.csv`  
   `region_household_marginals.csv`  
 
-#### Multi-Geographic Resolution Mapping data:  
+#### Multi-Geographic Resolution Mapping Data:
+
   `region_geo_mapping.csv`  
   `geo_sample_mapping.csv`
+
+Mapping files ensure accurate mapping and alignment of different data files with different resolutions. 
+
+Example of survey and marginal data collected and labeled with different geographic resolution levels:
+
+- **Region level**: Set as census county subdivision
+- **Geo level**: Set as census tracts
+- **Sample Geo level**: Set as Public Use Microdata Areas (PUMAs)
+
+
+
