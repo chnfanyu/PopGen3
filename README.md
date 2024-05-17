@@ -15,12 +15,19 @@
 ### Data Inputs
 
 #### Survey sample data:
-  - `household_sample.csv`
-  - `person_sample.csv`
-#### Marginal data
-- Geo-Level Marginals data:
-  - `person_marginals.csv`: Individual-level data.
-  - `household_marginals.csv`: Household-level data.
-- Region-Level Marginals data:
-  - `region_person_marginals.csv`: Regional individual data.
-  - `region_household_marginals.csv`: Regional household data
+   `household_sample.csv`: household-level data  
+   `person_sample.csv`: individual-level data  
+
+#### Marginal data:
+
+- **geo-level marginals:**  
+  `person_marginals.csv`  
+  `household_marginals.csv`  
+
+- **region-level marginals:**  
+  `region_person_marginals.csv`  
+  `region_household_marginals.csv`  
+
+#### Multi-Geographic Resolution Mapping data:  
+  `region_geo_mapping.csv`  
+  `geo_sample_mapping.csv`
