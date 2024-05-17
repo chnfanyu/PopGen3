@@ -1,12 +1,9 @@
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import pandas as pd
 import numpy as np
 import math
 import os
-
-
 
 def merge_and_encode(household_df, person_df, household_vars, person_vars):
     """
@@ -38,14 +35,11 @@ def merge_and_encode(household_df, person_df, household_vars, person_vars):
 
     return household_enriched
 
-
 def read_marginal_data(path, header_rows=[0, 1], index_col=0):
     """Reads CSV file with multi-level header and sets MultiIndex for columns."""
     df = pd.read_csv(path, header=header_rows, index_col=index_col)
-    # Transform column index to MultiIndex, assuming second level are integers
     df.columns = pd.MultiIndex.from_tuples([(col[0], int(col[1])) for col in df.columns])
     return df
-
 
 def plot_variables_in_subplots(variable_names_list, synthetic_df, marginal_df, geo, category_title):
     num_variables = len(variable_names_list)
@@ -84,22 +78,20 @@ def plot_variables_in_subplots(variable_names_list, synthetic_df, marginal_df, g
             # Add text on top of the bars
             for bar in bars_marginal:
                 width = bar.get_width()
-                label_x_pos = bar.get_x() + width + 1  # Adjust position to be outside the bar
+                label_x_pos = bar.get_x() + width + 1
                 ax.text(label_x_pos, bar.get_y(), f'{width:.0f}', va='center')
 
             for bar in bars_synthetic:
                 width = bar.get_width()
-                label_x_pos = bar.get_x() + width + 1  # Adjust position to be outside the bar
+                label_x_pos = bar.get_x() + width + 1
                 ax.text(label_x_pos, bar.get_y(), f'{width:.0f}', va='center')
 
     for j in range(i + 1, len(axes)):
         axes[j].axis('off')
 
     fig.suptitle(f'{category_title} Variables for Geo {geo}', fontsize=16)
-
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust the layout to make room for the suptitle
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     return fig
-
 
 def group_marginal_geo_by_region(household_marginal, geo_region_mapping):
     """
@@ -113,29 +105,18 @@ def group_marginal_geo_by_region(household_marginal, geo_region_mapping):
     Returns:
     - DataFrame grouped by 'region' with summed variables.
     """
-    # Create a dictionary that maps 'geo' to 'region'
     geo_to_region = dict(zip(geo_region_mapping['geo'], geo_region_mapping['region']))
-
-    # Copy household_marginal to avoid altering the original DataFrame
     household_marginal_copy = household_marginal.reset_index().copy()
-
-    # Add a 'region' column to the household marginal table copy
     household_marginal_copy['region'] = household_marginal_copy['geo'].map(geo_to_region)
-
-    # Group by 'region' and sum all variables
     household_marginal_grouped_by_region = household_marginal_copy.groupby('region').sum()
-
     return household_marginal_grouped_by_region
 
-
 def plot_marginal_distribution(household_marginal, region_household_marginal):
-    # User chooses between geo or region
     choice = input("Please enter 'geo' or 'region': ").strip().lower()
 
     if choice == 'geo':
         geo = int(input("Please enter the geographical area code: "))
         hsize_filter = input("Please enter the control variable: ")
-        # Case for geo
         geo_row = household_marginal.loc[geo]
         hsize_columns = [col for col in household_marginal.columns if hsize_filter in col]
         hsize_data = geo_row[hsize_columns]
@@ -149,9 +130,8 @@ def plot_marginal_distribution(household_marginal, region_household_marginal):
         plt.show()
 
     elif choice == 'region':
-        region_code = int(input("Please enter the geometrical unit: "))
+        region_code = int(input("Please enter the geographical area code: "))
         rhsize_filter = input("Please enter the control variable: ")
-        # Case for region
         region_row = region_household_marginal.loc[region_code]
         rhsize_columns = [col for col in region_household_marginal.columns if rhsize_filter in col]
         rhsize_data = region_row[rhsize_columns]
@@ -167,53 +147,42 @@ def plot_marginal_distribution(household_marginal, region_household_marginal):
     else:
         print("Invalid input, please enter 'geo' or 'region'.")
 
-
 def map_sample_geo_to_geo(household_sample, geo_sample_mapping):
     return household_sample.merge(geo_sample_mapping, on='sample_geo')
-
 
 def map_geo_to_region(geo_mapped_sample, region_geo_mapping):
     return geo_mapped_sample.merge(region_geo_mapping, on='geo')
 
-
 def plot_sample_distribution(household_sample, geo_sample_mapping, region_geo_mapping):
-    # 
     choice = input("Please enter 'geo' or 'region': ").strip().lower()
 
     if choice == 'geo':
         geo_id = int(input("Please enter geographical area code: "))
-        variable = input("Please enter the control variable(e.g., 'hsize'): ")
-        # 
+        variable = input("Please enter the control variable (e.g., 'hsize'): ")
         sample_geo_ids = geo_sample_mapping[geo_sample_mapping['geo'] == geo_id]['sample_geo'].unique()
-        # 
         data_to_plot = household_sample[household_sample['sample_geo'].isin(sample_geo_ids)]
 
-        # 
-        plt.figure(figsize=(8, 3))  # 
-        data_to_plot[variable].value_counts().sort_index().plot(kind='bar', color='skyblue') 
+        plt.figure(figsize=(8, 3))
+        data_to_plot[variable].value_counts().sort_index().plot(kind='bar', color='skyblue')
         plt.title(f'Sample Distribution of {variable} for GEO ID {geo_id}')
         plt.xlabel('Categories')
         plt.ylabel('Count')
-        plt.xticks(rotation=45)  # 
+        plt.xticks(rotation=45)
         plt.show()
 
     elif choice == 'region':
         region_id = int(input("Please enter geographical area code: "))
         variable = input("Please enter the control variable (e.g., 'rhsize'): ")
-        # 根据region_geo_mapping筛选出对应的geo
         geo_ids = region_geo_mapping[region_geo_mapping['region'] == region_id]['geo'].unique()
-        # 根据筛选出的geo筛选出对应的sample_geo
         sample_geo_ids = geo_sample_mapping[geo_sample_mapping['geo'].isin(geo_ids)]['sample_geo'].unique()
-        # 根据筛选出的sample_geo筛选出household_sample中的数据
         data_to_plot = household_sample[household_sample['sample_geo'].isin(sample_geo_ids)]
 
-        # 绘图
-        plt.figure(figsize=(8, 3))  # 调整图形大小以匹配plot_distribution函数
-        data_to_plot[variable].value_counts().sort_index().plot(kind='bar', color='skyblue')  # 使用相同的颜色
+        plt.figure(figsize=(8, 3))
+        data_to_plot[variable].value_counts().sort_index().plot(kind='bar', color='skyblue')
         plt.title(f'Sample Distribution of {variable} for REGION ID {region_id}')
         plt.xlabel('Categories')
         plt.ylabel('Count')
-        plt.xticks(rotation=45)  # x轴标签旋转以匹配plot_distribution函数
+        plt.xticks(rotation=45)
         plt.show()
 
     else:
