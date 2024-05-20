@@ -3,7 +3,7 @@ import os
 import sys
 
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Popgen'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'popgen'))
 
 from project import Project
 
