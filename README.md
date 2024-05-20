@@ -9,6 +9,7 @@
 - Advanced control of household and person variables across multiple geographic resolutions (region and geo).
 - Command-line interface for simplified usage and enhanced computational efficiency.
 - Fully compatible with Python 3, with updated dependencies.
+- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chnfanyu/PopGen3/HEAD)
 
 ## Contents
 
