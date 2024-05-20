@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
-
+from .config import Config
 
 class Draw_Population(object):
     def __init__(self, scenario_config, geo_ids, geo_row_idx, geo_frequencies,

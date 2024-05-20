@@ -2,7 +2,7 @@ import copy
 
 import numpy as np
 import pandas as pd
-
+from .config import Config
 
 # TODO: Move all DS processing in the Syn_Population Class
 class IPF_DS(object):
