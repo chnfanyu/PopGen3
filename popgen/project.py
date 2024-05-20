@@ -3,12 +3,12 @@ import os
 import time
 import yaml
 
-from config import Config
-from data import DB
-from ipf import Run_IPF
-from reweighting import Run_Reweighting, Reweighting_DS
-from draw import Draw_Population
-from output import Syn_Population
+from .config import Config
+from .data import DB
+from .ipf import Run_IPF
+from .reweighting import Run_Reweighting, Reweighting_DS
+from .draw import Draw_Population
+from .output import Syn_Population
 
 class Project(object):
     """This is the primary class to setup and run PopGen projects."""

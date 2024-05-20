@@ -1,3 +1,3 @@
 from .project import Project
 
-__version__ = '2.0.b2'
+__version__ = '3.0.1'
