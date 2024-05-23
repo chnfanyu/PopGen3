@@ -53,5 +53,11 @@ The `configuration.yaml` file contains several key sections for the PopGen setup
 | --- | --- | --- |
 | - synthesize<br>- name<br>- location | - entities<br>- column_names<br>- location | - description<br>- apply_region_controls<br>- control_variables<br>- parameters<br>- geos_to_synthesize<br>- outputs |
 
+### Key Outputs
 
+#### Sample Weighting Results
+- `weights.csv`
+#### Synthetic Population Generated
+- `housing_synthetic.csv`
+- `person_synthetic.csv`
 
