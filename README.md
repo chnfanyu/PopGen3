@@ -45,5 +45,15 @@ Example of survey and marginal data collected and labeled with different geograp
 - **Geo level**: Set as census tracts
 - **Sample Geo level**: Set as Public Use Microdata Areas (PUMAs)
 
+### Configuration Yaml 
+
+- The `configuration.yaml` file contains several key sections for the PopGen setup. 
+
+#### Designed Input Keys
+
+| **Project Wide Setting** | **Input Data Files** | **Scenario Settings** |
+| --- | --- | --- |
+| - synthesize<br>- name<br>- location | - entities<br>- column_names<br>- location | - description<br>- apply_region_controls<br>- control_variables<br>- parameters<br>- geos_to_synthesize<br>- outputs |
+
 
 
