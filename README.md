@@ -43,7 +43,7 @@ Example of multi-geographic resolution levels:
 - **Geo level**: Set as census tracts
 - **Sample Geo level**: Set as Public Use Microdata Areas (PUMAs)
 
-### Configuration Yaml 
+### Configuration File 
 
 The `configuration.yaml` file contains several key sections for the PopGen setup. 
 
