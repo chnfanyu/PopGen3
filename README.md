@@ -19,8 +19,8 @@
 ### Data Inputs
 
 #### Survey sample data:
-  `household_sample.csv`: household-level data  
-  `person_sample.csv`: individual-level data
+  `household_sample.csv`
+  `person_sample.csv`
 
 #### Population marginal data:
 
@@ -37,9 +37,7 @@
   `region_geo_mapping.csv`  
   `geo_sample_mapping.csv`
 
-Mapping files ensure accurate mapping and alignment of different data files with different resolutions. 
-
-Example of survey and marginal data collected and labeled with different geographic resolution levels:
+Example of different geographic resolution levels:
 
 - **Region level**: Set as census county subdivision
 - **Geo level**: Set as census tracts
@@ -47,7 +45,7 @@ Example of survey and marginal data collected and labeled with different geograp
 
 ### Configuration Yaml 
 
-- The `configuration.yaml` file contains several key sections for the PopGen setup. 
+The `configuration.yaml` file contains several key sections for the PopGen setup. 
 
 #### Designed Input Keys
 
