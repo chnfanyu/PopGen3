@@ -37,11 +37,11 @@
   `region_geo_mapping.csv`  
   `geo_sample_mapping.csv`
 
-Example of multi-geographic resolution levels:
+Example of Multi-Geographic Resolution Levels:
+- <small><i>Region Level:</i> Set as census county subdivision</small>
+- <small><i>Geo Level:</i> Set as census tracts</small>
+- <small><i>Sample Geo Level:</i> Set as Public Use Microdata Areas (PUMAs)</small>
 
-- **Region level**: Set as census county subdivision
-- **Geo level**: Set as census tracts
-- **Sample Geo level**: Set as Public Use Microdata Areas (PUMAs)
 
 ### Configuration File 
 
