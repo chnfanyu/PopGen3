@@ -37,7 +37,7 @@
   `region_geo_mapping.csv`  
   `geo_sample_mapping.csv`
 
-Example of different geographic resolution levels:
+Example of multi-geographic resolution levels:
 
 - **Region level**: Set as census county subdivision
 - **Geo level**: Set as census tracts
