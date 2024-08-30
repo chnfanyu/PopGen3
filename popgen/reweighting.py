@@ -7,7 +7,7 @@ from scipy.optimize import fsolve, newton
 
 # from sympy.abc import x as root
 # from sympy import solve
-from .config import Config
+# from .config import Config
 
 # TODO: Move all DS processing to Syn_Population Class
 class Reweighting_DS(object):

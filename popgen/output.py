@@ -2,7 +2,7 @@ import os
 import time
 import pandas as pd
 import numpy as np
-from .config import Config
+# from .config import Config
 
 class Syn_Population:
     def __init__(self, location, db, column_names_config, scenario_config, run_ipf_obj, run_ipu_obj, draw_population_obj, entities, housing_entities, person_entities):

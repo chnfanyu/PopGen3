@@ -10,13 +10,17 @@
 - Command-line interface for simplified usage and enhanced computational efficiency.
 - Fully compatible with Python 3, with updated dependencies.
 
+## Run PopGen3 Online
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1j1Stb8IA8OfaoPRh232kId8hqi3dUtur?usp=sharing)
+- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/chnfanyu/PopGen3/HEAD)
+
 ## Contents
 
 ### Data Inputs
 
 #### Survey sample data:
-  `household_sample.csv`: household-level data  
-  `person_sample.csv`: individual-level data
+  `household_sample.csv`
+  `person_sample.csv`
 
 #### Population marginal data:
 
@@ -33,13 +37,27 @@
   `region_geo_mapping.csv`  
   `geo_sample_mapping.csv`
 
-Mapping files ensure accurate mapping and alignment of different data files with different resolutions. 
-
-Example of survey and marginal data collected and labeled with different geographic resolution levels:
-
-- **Region level**: Set as census county subdivision
-- **Geo level**: Set as census tracts
-- **Sample Geo level**: Set as Public Use Microdata Areas (PUMAs)
+Example of Multi-Geographic Resolution Levels:
+- <small><i>Region Level:</i> Set as census county subdivision</small>
+- <small><i>Geo Level:</i> Set as census tracts</small>
+- <small><i>Sample Geo Level:</i> Set as Public Use Microdata Areas (PUMAs)</small>
 
 
+### Configuration File 
+
+The `configuration.yaml` file contains several key sections for the PopGen setup. 
+
+#### Designed Input Keys
+
+| **Project Wide Setting** | **Input Data Files** | **Scenario Settings** |
+| --- | --- | --- |
+| - synthesize<br>- name<br>- location | - entities<br>- column_names<br>- location | - description<br>- apply_region_controls<br>- control_variables<br>- parameters<br>- geos_to_synthesize<br>- outputs |
+
+### Key Outputs
+
+#### Sample Weighting Results
+- `weights.csv`
+#### Synthetic Population Generated
+- `housing_synthetic.csv`
+- `person_synthetic.csv`
 
