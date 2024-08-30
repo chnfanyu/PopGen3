@@ -59,7 +59,7 @@ project:
     geos_to_synthesize:
      region:
      #Leave empty blank if we synthesize specific region, then use ID
-      ids: [9]
+      ids: [1]
       all_ids: True
      geo:
       ids: []
