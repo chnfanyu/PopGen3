@@ -1,11 +1,11 @@
 project:
- synthesize: True
- name: Arizona_Synthetic_Population
- location: ./Arizona
+ synthesize: False
+ name: heat weights data
+ location: ./heat_weights_data
 #Setup input data with given forms
  inputs:
-  entities: [household, groupquarter, person]
-  housing_entities: [household, groupquarter]
+  entities: [household, person]
+  housing_entities: [household]
   person_entities: [person]
   column_names:
    hid: hid
@@ -15,34 +15,29 @@ project:
    sample_geo: sample_geo
   location:
    geo_corr_mapping:
-    geo_to_sample: geo_sample_mapping.csv
-    region_to_sample: region_sample_mapping.csv
-    region_to_geo: region_geo_mapping.csv
+    geo_to_sample: geo_sample_mapping_heat.csv
+    region_to_sample: region_sample_mapping_heat.csv
+    region_to_geo: region_geo_mapping_heat.csv
    sample:
-    household: household_sample.csv
-    person: person_sample.csv
-    groupquarter: groupquarter_sample.csv
+    household: household_sample_heat.csv
+    person: person_sample_heat.csv
    marginals:
     geo:
-     household: household_marginals.csv
-     person: person_marginals.csv
-     groupquarter: groupquarter_marginals.csv
+     household: household_marginals_heat.csv
+     person: person_marginals_heat.csv
     region:
-     household: region_household_marginals.csv
-     person: region_person_marginals.csv
-     groupquarter: region_groupquarter_marginals.csv
+     household: region_household_marginals_heat.csv
+     person: region_person_marginals_heat.csv
  scenario:
   - description: Arizona TAZ Scenario 
     apply_region_controls: True
     control_variables:
      region:
-      household: [rinc, hhrtotals]
-      groupquarter: [gqrtotals]
-      person: [rpsex, rpage,rempl, rptotals]
+      household: [rhtotals, rhinc, rhsize, rhchild]
+      person: [rptotals, rhage,rhedu, rhrace, rhemp]
      geo:
-      household: [hinc, hhtotals]
-      groupquarter: [gqtotals]
-      person: [psex, page,empl, ptotals]
+      household: [hinc, htotals, hsize, hchild]
+      person: [ptotals, hsex, hage, hedu, hrace, hemp]
       
     parameters:
      ipf:
@@ -79,10 +74,6 @@ project:
         filename: hhsize_income.csv
         filetype: csv
         entity: household
-      - variables: [rpsex, rpage]
-        filename: rpsex_rpage.csv
-        filetype: csv
-        entity: person
      summary:
       region:
        filename: summary_region.csv
