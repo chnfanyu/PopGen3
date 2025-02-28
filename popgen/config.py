@@ -1,4 +1,7 @@
 import yaml
+import logging
+
+#logging.basicConfig(level=logging.INFO)
 
 
 class ConfigError(Exception):
@@ -6,19 +9,17 @@ class ConfigError(Exception):
 
 
 def wrap_config_value(value):
-    """The method is used to wrap YAML elements as Config objects. So the
-    YAML properties can be accessed using attribute access.
-    E.g. If config object - x for is specificed as the following YAML:
+    """Wrap YAML elements as Config objects to allow attribute access.
 
-    attribbute1:
-        attribute2     : 'Value'
+    Example:
+    If YAML defines:
+        attribute1:
+            attribute2: 'Value'
 
-    then attribute access x.attribute1.attribute2 is used to access "Value".
-    Also, x.attribute can be used to access the dictionary {attribute: 'value'}
+    Then, x.attribute1.attribute2 can be used to access "Value".
     """
     if isinstance(value, str):
         return value
-
     try:
         return value + 0
     except TypeError:
@@ -27,60 +28,94 @@ def wrap_config_value(value):
     return Config(value)
 
 
-class Config(object):
-    """The class returns a Config object that can be used to access the
-    different YAML elements used to specify the PopGen project.
-    """
+class Config:
+    """Config class for handling YAML configuration as attribute-accessible objects."""
+
+    DEFAULT_PARAMETERS = {
+        "ipf": {
+            "tolerance": 0.0001,
+            "iterations": 250,
+            "zero_marginal_correction": 0.00001,
+            "rounding_procedure": "bucket",
+            "archive_performance_frequency": 1
+        },
+        "reweighting": {
+            "procedure": "ipu",
+            "tolerance": 0.0001,
+            "inner_iterations": 1,
+            "outer_iterations": 50,
+            "archive_performance_frequency": 1
+        },
+        "draws": {
+            "pvalue_tolerance": 0.9999,
+            "iterations": 25,
+            "seed": 0
+        }
+    }
+
     def __init__(self, data):
-        self._data = data
+        self._data = data or {}
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __setattr__(self, key, value):
+        if key == "_data":
+            super().__setattr__(key, value)
+        else:
+            self._data[key] = value
 
     def __getattr__(self, key):
         value = self.return_value(key)
-        return wrap_config_value(value)
+        return wrap_config_value(value) if value is not None else None
 
     def __getitem__(self, key):
         value = self.return_value(key)
         return wrap_config_value(value)
+
+    def __getstate__(self):
+        """Ensure `yaml.dump()` works correctly with Config objects."""
+        return self.__dict__
 
     def write_to_file(self, filepath):
         with open(filepath, 'w') as file:
             yaml.dump(self._data, file, default_flow_style=False)
 
     def return_value(self, key):
+        """Retrieve value from config data safely."""
         try:
             return self._data[key]
         except KeyError:
-            # Provide a default value or handle the missing key appropriately
-            print(f"Warning: Key '{key}' not found in configuration. Using default value.")
-            return None  # or some sensible default
+            logging.warning(f"Key '{key}' not found in configuration.")
+            return None  # Return None instead of raising an error
 
     def __len__(self):
         return len(self._data)
 
     def __repr__(self):
-        return self._data.__repr__()
+        return repr(self._data)
 
     def return_list(self):
+        """Return a list of top-level keys in the configuration."""
         data_list = []
         for i in self._data:
             data_list.append(i)
         return data_list
 
     def return_dict(self):
-        return self._data
+        """Convert nested Config objects to pure dictionaries."""
+
+        def convert(value):
+            if isinstance(value, Config):
+                return value.return_dict()
+            elif isinstance(value, list):
+                return [convert(v) for v in value]
+            elif isinstance(value, dict):
+                return {k: convert(v) for k, v in value.items()}
+            return value
+
+        return convert(self._data)
 
     def write_to_open(self, filepath):
         with open(filepath, 'w') as outfile:
-            outfile.write(yaml.dump(self._data,
-                                    default_flow_style=False))
-
-
-if __name__ == "__main__":
-    import yaml
-
-    yaml_f = open("configuration_arizona.yaml", "r")
-
-    config_dict = yaml.safe_load(yaml_f)
-    config_obj = Config(config_dict)
-    print (config_obj.project.name)
-    print (config_obj["project"]["name"])
+            yaml.dump(self._data, outfile, default_flow_style=False)

@@ -1,25 +1,13 @@
 import os
-
 import pandas as pd
 import numpy as np
-
+import logging
 from .config import ConfigError
 
 
-class DB(object):
-    """This class returns a Inputs object that can be used to handle all
-    the Popgen input data files. All input files are stored as Pandas
-    dataframe objects. The object maintains the following PopGen inputs:
-    - Two geographic correspondence mapping inputs
-    1) a mapping between region and geo
-    2) a mapping between geo and sample_geo
-    - Two sets of sample data files
-    1) for housing entities
-    2) for person entities
-    - Two sets of marginal data files
-    1) for housing entities
-    2) for person entities
-    """
+class DB:
+    """Handles all PopGen input data files and maintains necessary mappings and datasets."""
+
     def __init__(self, config):
         self.config = config
         self.sample = {}
@@ -33,88 +21,112 @@ class DB(object):
         self.location = os.path.abspath(self.config.project.location)
 
     def load_data(self):
+        """Loads all required data while handling missing data gracefully."""
+        logging.info("Loading database data...")
 
-        geo_corr_mapping_config = self._inputs_config.location.geo_corr_mapping
-        self.geo = self.get_data(geo_corr_mapping_config)
+        # Load geo correspondence mapping
+        geo_corr_mapping_config = getattr(self._inputs_config.location, "geo_corr_mapping", None)
+        self.geo = self.get_data(geo_corr_mapping_config) if geo_corr_mapping_config else {}
 
-        sample_config = self._inputs_config.location.sample
-        self.sample = self.get_data(sample_config)
+        # Load sample data
+        sample_config = getattr(self._inputs_config.location, "sample", None)
+        self.sample = self.get_data(sample_config) if sample_config else {}
 
-        geo_marginals_config = self._inputs_config.location.marginals.geo
-        self.geo_marginals = self.get_data(geo_marginals_config,
-                                           header=[0, 1])
+        # Load marginals
+        marginals_config = getattr(self._inputs_config.location, "marginals", None)
+        self.geo_marginals = self.get_data(getattr(marginals_config, "geo", None),
+                                           header=[0, 1]) if marginals_config and hasattr(marginals_config,
+                                                                                          "geo") else {}
+        self.region_marginals = self.get_data(getattr(marginals_config, "region", None),
+                                              header=[0, 1]) if marginals_config and hasattr(marginals_config,
+                                                                                             "region") else {}
 
-        region_marginals_config = self._inputs_config.location.marginals.region
-        self.region_marginals = self.get_data(region_marginals_config,
-                                              header=[0, 1])
-        # print(self.geo_marginals
-
-        self._enumerate_geo_ids()
+        try:
+            self._enumerate_geo_ids()
+        except Exception as e:
+            logging.warning(f"_enumerate_geo_ids failed due to {e}. Defaulting to empty lists.")
+            self.geo_ids = []
+            self.region_ids = []
 
     def get_data(self, config, header=0):
-        config_dict = config.return_dict()
-        # print(config_dict, type(config_dict)
+        """Loads data while handling missing files gracefully."""
+        config_dict = config.return_dict() if config else {}
         data_dict = {}
-        for item in config_dict:
-            filename = config_dict[item]
-            full_location = os.path.join(self.location, filename)
-            data_dict[item] = pd.read_csv(full_location, index_col=0,
-                                          header=header)
 
-            data_dict[item].loc[:,
-                                data_dict[item].index.name] = (data_dict[item]
-                                                               .index.values)
-            # print(data_dict[item]
-        # print(data_dict.keys()
+        for item, filename in config_dict.items():
+            if filename is None:
+                logging.warning(f"{item} has no filename specified. Skipping.")
+                continue
+
+            full_location = os.path.join(self.location, filename)
+            if os.path.exists(full_location):
+                try:
+                    data_dict[item] = pd.read_csv(full_location, index_col=0, header=header)
+                    if data_dict[item].index.name:
+                        data_dict[item].loc[:, data_dict[item].index.name] = data_dict[item].index.values
+                except Exception as e:
+                    logging.warning(f"Failed to load {filename} due to {e}. Skipping {item}.")
+            else:
+                logging.warning(f"{filename} not found. Skipping {item}.")
+
         return data_dict
 
     def _enumerate_geo_ids(self):
-        geo_to_sample = self.geo["geo_to_sample"]
-        self.geo_ids_all = geo_to_sample.index.tolist()
-        # self.sample_geo_ids = np.unique(geo_to_sample[self._inputs_config
-        #                                              .column_names
-        #                                              .sample_geo].values)
-        region_to_geo = self.geo["region_to_geo"]
-        self.region_ids_all = np.unique(region_to_geo.index.values).tolist()
+        """Ensures proper initialization of geo and region IDs."""
+        self.geo_ids_all = []
+        self.region_ids_all = []
 
-        # region_to_sample = self.geo["region_to_sample"]
-        # self.region_ids = np.unique(region_to_sample.index.values)
+        try:
+            if "geo_to_sample" in self.geo:
+                self.geo_ids_all = self.geo["geo_to_sample"].index.tolist()
+
+            if "region_to_geo" in self.geo:
+                self.region_ids_all = np.unique(self.geo["region_to_geo"].index.values).tolist()
+            elif "region_to_sample" in self.geo:
+                self.region_ids_all = np.unique(self.geo["region_to_sample"].index.values).tolist()
+        except Exception as e:
+            logging.warning(f"Failed to enumerate geo IDs due to {e}. Defaulting to empty lists.")
+            self.geo_ids_all = []
+            self.region_ids_all = []
 
     def get_geo_ids_for_region(self, region_id):
+        """Retrieves geo IDs corresponding to a given region ID."""
         geo_name = self._inputs_config.column_names.geo
-        return (
-            self.geo["region_to_geo"].loc[region_id, geo_name].copy().tolist())
+        geo_list = self.geo["region_to_geo"].loc[region_id, geo_name]
+        return [int(geo_list)] if isinstance(geo_list, (int, np.integer)) else list(geo_list)
 
     def enumerate_geo_ids_for_scenario(self, scenario_config):
+        """Ensures geo enumeration is handled even when missing data is encountered."""
         try:
-            self.region_ids = scenario_config.geos_to_synthesize.region.ids
+            self.region_ids = getattr(scenario_config.geos_to_synthesize.region, "ids", self.region_ids_all)
             self.geo_ids = []
-            for region_id in self.region_ids:
-                self.geo_ids += self.get_geo_ids_for_region(region_id)
+
+            if "region_to_geo" in self.geo:
+                for region_id in self.region_ids:
+                    geo_list = self.get_geo_ids_for_region(region_id)
+                    if geo_list:
+                        self.geo_ids += geo_list
+            else:
+                print("⚠️ No region_to_geo mapping. Using only region data.")
+                self.geo_ids = self.region_ids if self.region_ids else []
         except ConfigError as e:
-            print("KeyError", e)
-            self.geo_ids = self.geo_ids_all
-            # self.sample_geo_ids = self.sample_geo_ids_all
-            self.region_ids = self.region_ids_all
+            print(f"⚠️ KeyError: {e}. Defaulting to all geo and region IDs.")
+            self.geo_ids = self.geo_ids_all if self.geo_ids_all else []
+            self.region_ids = self.region_ids_all if self.region_ids_all else []
 
     def return_variables_cats(self, entity, variable_names):
-        variables_cats = {}
-        for variable_name in variable_names:
-            variables_cats[variable_name] = (self.return_variable_cats
-                                             (entity, variable_name))
-        return variables_cats
+        """Returns unique categories for each variable in an entity dataset."""
+        return {var: self.return_variable_cats(entity, var) for var in variable_names}
 
     def return_variable_cats(self, entity, variable_name):
+        """Returns unique values for a specific variable in an entity dataset."""
         return np.unique(self.sample[entity][variable_name].values).tolist()
 
     def check_data(self):
+        """Runs data consistency checks."""
         self.check_sample_marginals_consistency()
         self.check_marginals()
 
     def check(self):
-        # TODO: check if the ids entered are consistent with the region ids
-        # TODO: check consistency in variables across files
-        # TODO: check consistency in categories across files
-        # TODO: check consistency in marginals across
-        # TODO: check geo ids, sample geo ids, region ids across files
+        """Placeholder for additional data consistency checks."""
         pass
